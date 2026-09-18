@@ -33,18 +33,28 @@ jobs:
 
     # Compare new libs to old libs
     - name: Download Previous Libs
+      id: download-previous
+      continue-on-error: true
       uses: robinraju/release-downloader@v1.2
       with:
         repository: ${{ github.repository }}
         latest: true
-        fileName: "Stripped.zip" 
+        fileName: "Stripped.zip"
     - name: Unzip Previous Libs
+      if: steps.download-previous.outcome == 'success'
       run: Expand-Archive -Path Stripped.zip -DestinationPath prev
     - name: Compare Files
       id: compare
       shell: bash
-      run: diff stripped prev > /dev/null && echo "::set-output name=different::false" || echo "::set-output name=different::true"
-
+      run: |
+        if [ ! -d prev ]; then
+          echo "No previous release found — treating as different."
+          echo "different=true" >> "$GITHUB_OUTPUT"
+        elif diff -rq stripped prev > /dev/null; then
+          echo "different=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "different=true" >> "$GITHUB_OUTPUT"
+        fi
     # Upload DLLs if different
     - name: Upload Stripped DLLs
       if: ${{ steps.compare.outputs.different == 'true' }}
