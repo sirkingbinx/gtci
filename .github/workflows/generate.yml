@@ -81,16 +81,22 @@ jobs:
       run: Compress-Archive -Path .\stripped\*.dll -DestinationPath .\compressed.zip
  
     # Bump semver
-    - name: Get Last Tag
-      if: ${{ needs.generate.outputs.upload-files == 'true'}}
-      id: get-latest-tag
-      run: echo "::set-output name=tag::$(git tag --sort=v:refname | tail -n 1)"
+    - name: Get Latest Tag
+      id: vars
+      run: |
+        # Fetch all tags explicitly
+        git fetch --tags
+        
+        # Get the latest tag name reachable from history
+        LATEST_TAG=$(git describe --tags --abbrev=0)
+        
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
     - name: Bump semver
       if: ${{ needs.generate.outputs.upload-files == 'true'}}
       id: bump-semver
       uses: actions-ecosystem/action-bump-semver@v1
       with:
-        current_version: ${{ steps.get-latest-tag.outputs.tag }}
+        current_version: ${{ steps.vars.outputs.latest_tag }}
         level: minor
     # Made release
     - name: Create Release
