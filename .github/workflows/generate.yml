@@ -98,7 +98,7 @@ jobs:
       uses: actions-ecosystem/action-bump-semver@v1
       with:
         current_version: ${{ steps.vars.outputs.latest_tag }}
-        level: minor
+        level: patch
     # Made release
     - name: Create Release
       if: ${{ needs.generate.outputs.upload-files == 'true'}}
