@@ -69,6 +69,8 @@ jobs:
     steps:
     # Download stripped libs from previous job
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
     - name: Download Libs
       if: ${{ needs.generate.outputs.upload-files == 'true'}}
       uses: actions/download-artifact@v8
@@ -78,19 +80,18 @@ jobs:
     - name: Zip Files
       if: ${{ needs.generate.outputs.upload-files == 'true'}}
       shell: pwsh
-      run: Compress-Archive -Path .\stripped\*.dll -DestinationPath .\compressed.zip
+      run: Compress-Archive -Path .\stripped\*.dll -DestinationPath .\Stripped.zip
  
     # Bump semver
     - name: Get Latest Tag
       id: vars
       run: |
-        # Fetch all tags explicitly
         git fetch --tags
-        
-        # Get the latest tag name reachable from history
-        LATEST_TAG=$(git describe --tags --abbrev=0)
-        
-        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        LATEST_TAG=$(git tag --sort=-v:refname | head -n1)
+        if [ -z "$LATEST_TAG" ]; then
+          LATEST_TAG="v0.0.0"
+        fi
+        echo "latest_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
     - name: Bump semver
       if: ${{ needs.generate.outputs.upload-files == 'true'}}
       id: bump-semver
