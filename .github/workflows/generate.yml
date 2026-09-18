@@ -2,7 +2,7 @@ name: Generate Stripped DLLs
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 * * * *
+    - cron: 0 20 * * *
 
 jobs:
   generate:
