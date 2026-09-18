@@ -11,9 +11,9 @@ jobs:
       upload-files: ${{ steps.compare.outputs.different }}
     steps:
     # Compile
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v7
     - name: Setup MSBuild
-      uses: warrenbuckley/Setup-MSBuild@v1
+      uses: microsoft/setup-msbuild@v3
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     - name: Install dependencies
