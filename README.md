@@ -1,11 +1,36 @@
-# 📝 BeatStripper &nbsp;[![Actions Status](https://github.com/lolPants/BeatStripper/workflows/.NET%20Build/badge.svg)](https://github.com/lolPants/BeatStripper/actions)
-_Generate stripped Beat Saber DLLs for use in CI_
+# Gorilla Tag Stripped Assemblies [![Generate Stripped DLLs](https://github.com/sirkingbinx/gtci/actions/workflows/generate.yml/badge.svg)](https://github.com/sirkingbinx/gtci/actions/workflows/generate.yml)
+This is mostly meant for building mods on Actions runners without any access to a Gorilla Tag installation. This fully strips the assemblies so you aren't breaking the LAW when downloading assemblies over the internet.
 
-## 🔧 About
-This program resolves your Beat Saber install directory, then generates virtualised and stripped DLLs for use in CI. It currently only strips core game and Unity assemblies (feel free to PR the name whitelist if a DLL you need is being ignored).
+[This composite GitHub action](https://github.com/sirkingbinx/setup-gorilla-tag) will automatically do the hard labor of setting up Gorilla Tag and BepInEx, just point your project to the Libs folder when building over actions.
 
-## 🚀 Usage
-Download the latest artifact from [CI autobuild](https://github.com/lolPants/BeatStripper/actions) and run the `.exe`. Stripped DLLs are output to a folder named `stripped` in the working directory of the `.exe`, with a game version subfolder.
+```yml
+name: Build Mod
 
-## ⚠ Legal Disclaimer
-Obviously these DLLs are the copyright of Beat Games and Unity respectively. Whether function signatures are copyrightable is down to a lawyer, which I am not. Only distribute stripped DLLs if you have the legal right to do so. By using this tool, you agree that I hold no responsibility for any legal trouble you may get into for distributing stripped DLLs.
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+  
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Setup Gorilla Tag
+        uses: sirkingbinx/setup-gorilla-tag@1.0.0
+
+      - name: Build Solution
+        run: |
+          dotnet build -c Debug
+          dotnet build -c Release
+```
+
+These assemblies can be downloaded from anywhere, so you're free to setup Gitea Actions or whatever else you want with these assemblies.
