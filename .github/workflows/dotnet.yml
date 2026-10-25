@@ -12,11 +12,9 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup MSBuild
-      uses: warrenbuckley/Setup-MSBuild@v1
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    - uses: actions/checkout@v7
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
     - name: Install dependencies
       run: msbuild -t:restore
     - name: Build project
