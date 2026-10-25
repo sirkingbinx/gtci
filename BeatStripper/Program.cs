@@ -40,7 +40,7 @@ namespace BeatStripper
                 Logger.Log("Creating output directory");
                 Directory.CreateDirectory(outDir);
 
-                string[] whitelist = new string[]
+                string[] bepinexWhitelist = new string[]
                 {
                     "TextMeshPro",
                     "UnityEngine.",
@@ -55,14 +55,14 @@ namespace BeatStripper
                     "PlayFab"
                 };
 
-                foreach (string f in ResolveDLLs(managedDir, whitelist))
+                foreach (string f in ResolveDLLs(managedDir))
                 {
                     StripDLL(f, outDir, bepinexLibsDir, managedDir);
                 }
 
                 if (Directory.Exists(bepinexLibsDir))
                 {
-                    foreach (string f in ResolveDLLs(bepinexLibsDir, whitelist))
+                    foreach (string f in ResolveDLLs(bepinexLibsDir, bepinexWhitelist))
                     {
                         StripDLL(f, outDir, bepinexLibsDir, managedDir);
                     }
@@ -75,12 +75,13 @@ namespace BeatStripper
             }
         }
 
-        internal static string[] ResolveDLLs(string managedDir, string[] whitelist)
+        internal static string[] ResolveDLLs(string managedDir, string[] whitelist = null)
         {
             var files = Directory.GetFiles(managedDir).Where(path =>
             {
                 FileInfo info = new FileInfo(path);
-                if (info.Extension != ".dll") return false;
+                if (!string.Equals(info.Extension, ".dll", StringComparison.OrdinalIgnoreCase)) return false;
+                if (whitelist == null) return true;
 
                 foreach (string substr in whitelist)
                 {
