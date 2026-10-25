@@ -20,7 +20,7 @@ jobs:
     - name: Build project
       run: msbuild BeatStripper.sln /t:Build /p:Configuration=Release
     - name: Upload DLLs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v7
       with:
         name: BeatStripper-${{ github.sha }}
         path: ./BeatStripper/bin/Release
